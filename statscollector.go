@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/florentchauveau/go-kamailio-binrpc/v2"
+	"github.com/florentchauveau/go-kamailio-binrpc"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/urfave/cli.v1"
