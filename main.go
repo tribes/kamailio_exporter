@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/urfave/cli.v1"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/push"
+
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/urfave/cli.v1"
 )
 
 var Version string
@@ -59,6 +63,24 @@ func main() {
 			Usage:  "The http scrape path",
 			EnvVar: "METRICS_PATH",
 		},
+		cli.StringFlag{
+			Name:   "gatewayIp",
+			Value:  "0.0.0.0",
+			Usage:  "Prometheus gateway ip to push metrics to",
+			EnvVar: "GATEWAY_IP",
+		},
+		cli.IntFlag{
+			Name:   "gatewayPort",
+			Value:  9091,
+			Usage:  "Prometheus gateway port to push metrics to",
+			EnvVar: "GATEWAY_PORT",
+		},
+		cli.IntFlag{
+			Name:   "pushInterval",
+			Value:  0,
+			Usage:  "Interval to push metrics ( seconds )",
+			EnvVar: "PUSH_INTERVAL",
+		},
 	}
 	app.Action = appAction
 	// then start the application
@@ -84,6 +106,26 @@ func appAction(c *cli.Context) error {
 	}
 	// and register it in prometheus API
 	prometheus.MustRegister(collector)
+
+	// start gorouting to push metrics
+	if pushInterval := c.Int("pushInterval"); pushInterval > 0 {
+		go func() {
+			pushAddress := fmt.Sprintf("%s:%d", c.String("gatewayIp"), c.Int("gatewayPort"))
+			client := push.New(pushAddress, "kamailio")
+			client.Collector(collector)
+
+			for {
+				err := client.Push()
+				if err != nil {
+					log.Error("Unable to push metrics to %s: %s", pushAddress, err)
+					os.Exit(1)
+				}
+				log.Info("Pushed %d metrics.")
+
+				time.Sleep(time.Duration(pushInterval) * time.Second)
+			}
+		}()
+	}
 
 	metricsPath := c.String("metricsPath")
 	listenAddress := fmt.Sprintf("%s:%d", c.String("bindIp"), c.Int("bindPort"))

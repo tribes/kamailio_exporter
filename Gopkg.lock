@@ -50,12 +50,13 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:0de31727c88e9f4a4ae70c28b6caa27f39b25788daf2dc4f7406013421228144"
+  digest = "1:e1602279f6abf8c2d2514e3ab68f8dbe6c1b164191637a6524c9f941f3a2056a"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
     "prometheus/internal",
     "prometheus/promhttp",
+    "prometheus/push",
   ]
   pruneopts = "UT"
   revision = "50c4339db732beb2165735d2cde0bff78eb3c5a5"
@@ -82,15 +83,15 @@
   version = "v0.4.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:143586a82affa4434b01666d886709858ab9b834f815c73d3d6740fa83a7c7e4"
+  digest = "1:f8fac244ec2cb7daef48b0148dcf5a330ac7697fa83c2e1e78e65b21f7f43500"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
     "internal/fs",
   ]
   pruneopts = "UT"
-  revision = "3cb620ac02d09c0648c0ea033ea9706e5d11e416"
+  revision = "65bdadfa96aecebf4dcf888da995a29eab4fc964"
+  version = "v0.0.1"
 
 [[projects]]
   digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
@@ -106,7 +107,7 @@
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "adf421d2caf4ffcf74142ff5fb9ee323b21a819e"
+  revision = "69e3a3a65b5bed52b8194d33c59d955757d87523"
 
 [[projects]]
   digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
@@ -123,6 +124,7 @@
     "github.com/florentchauveau/go-kamailio-binrpc",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
+    "github.com/prometheus/client_golang/prometheus/push",
     "github.com/sirupsen/logrus",
     "gopkg.in/urfave/cli.v1",
   ]
