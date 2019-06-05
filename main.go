@@ -113,14 +113,24 @@ func appAction(c *cli.Context) error {
 			pushAddress := fmt.Sprintf("%s:%d", c.String("gatewayIp"), c.Int("gatewayPort"))
 			client := push.New(pushAddress, "kamailio")
 			client.Collector(collector)
+			host := c.String("host")
+			if host == "" {
+				var err error
+				host, err = os.Hostname()
+
+				if err != nil {
+					log.WithError(err).Error("Unable to get hostname.")
+				}
+			}
+			client.Grouping("instance", host)
 
 			for {
-				err := client.Push()
+				err := client.Add()
 				if err != nil {
-					log.Error("Unable to push metrics to %s: %s", pushAddress, err)
+					log.Errorf("Unable to push metrics to %s: %s", pushAddress, err)
 					os.Exit(1)
 				}
-				log.Info("Pushed %d metrics.")
+				log.Info("Pushed metrics.")
 
 				time.Sleep(time.Duration(pushInterval) * time.Second)
 			}
