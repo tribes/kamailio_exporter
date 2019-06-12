@@ -64,10 +64,10 @@ func main() {
 			EnvVar: "METRICS_PATH",
 		},
 		cli.StringFlag{
-			Name:   "gatewayIp",
-			Value:  "0.0.0.0",
+			Name:   "gatewayHost",
+			Value:  "127.0.0.1",
 			Usage:  "Prometheus gateway ip to push metrics to",
-			EnvVar: "GATEWAY_IP",
+			EnvVar: "GATEWAY_HOST",
 		},
 		cli.IntFlag{
 			Name:   "gatewayPort",
@@ -110,9 +110,10 @@ func appAction(c *cli.Context) error {
 	// start gorouting to push metrics
 	if pushInterval := c.Int("pushInterval"); pushInterval > 0 {
 		go func() {
-			pushAddress := fmt.Sprintf("%s:%d", c.String("gatewayIp"), c.Int("gatewayPort"))
+			pushAddress := fmt.Sprintf("%s:%d", c.String("gatewayHost"), c.Int("gatewayPort"))
 			client := push.New(pushAddress, "kamailio")
 			client.Collector(collector)
+
 			host := c.String("host")
 			if host == "" {
 				var err error
