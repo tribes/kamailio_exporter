@@ -81,6 +81,17 @@ func main() {
 			Usage:  "Interval to push metrics ( seconds )",
 			EnvVar: "PUSH_INTERVAL",
 		},
+		cli.StringFlag{
+			Name:   "pushGroupingLabel",
+			Value:  "instance",
+			Usage:  "Label to add when pushing metrics to prometheus pushgateway",
+			EnvVar: "PUSH_GROUPING_LABEL",
+		},
+		cli.StringFlag{
+			Name:   "pushGroupingValue",
+			Usage:  "Value to associate with the grouping label",
+			EnvVar: "PUSH_GROUPING_VALUE",
+		},
 	}
 	app.Action = appAction
 	// then start the application
@@ -114,16 +125,11 @@ func appAction(c *cli.Context) error {
 			client := push.New(pushAddress, "kamailio")
 			client.Collector(collector)
 
-			host := c.String("host")
-			if host == "" {
-				var err error
-				host, err = os.Hostname()
-
-				if err != nil {
-					log.WithError(err).Error("Unable to get hostname.")
-				}
+			pushGroupingLabel := c.String("pushGroupingLabel")
+			pushGroupingValue := c.String("pushGroupingValue")
+			if pushGroupingLabel != "" && pushGroupingValue != "" {
+				client.Grouping(pushGroupingLabel, pushGroupingValue)
 			}
-			client.Grouping("instance", host)
 
 			for {
 				err := client.Add()
